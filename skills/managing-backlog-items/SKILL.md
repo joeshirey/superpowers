@@ -130,7 +130,10 @@ NO WRITE TO THE BACKLOG FILE WITHOUT AN APPROVED DRAFT
 
 5. DRAFT THE ENTRY (full markdown, no abbreviation)
    Use the open-item template. If any field cannot be filled
-   confidently: ASK. Never invent.
+   confidently: ASK the human partner before drafting. Never invent,
+   AND never write "TBD", "needs profiling", "to be determined", or
+   similar placeholders. Placeholder-filled entries cannot be acted
+   on later — ASK now while the context is fresh.
 
 6. SHOW THE DRAFT AND GET EXPLICIT APPROVAL BEFORE WRITING
    Print the full drafted entry and the chosen priority section.
@@ -249,6 +252,8 @@ Estimate silently. The human partner sees the size during show-before-write and 
 - Adding to `.gitignore` without asking
 - Skipping the duplicate check because the item "seems obviously new"
 - Inventing field values when you don't have the information — **ASK** instead
+- Filling unknown fields with "TBD" / "needs profiling" / "to be determined" placeholders instead of asking — placeholders produce backlog entries that cannot be acted on later
+- Treating an "obvious" or "simple" capture request as exempt from the procedure — every backlog write goes through the full procedure (storage check, duplicate check, structured template, show-before-write). There is no fast path
 - Silently expanding scope (just doing the tangential work) instead of asking capture / do-now / drop
 - Drafting an XXL entry instead of recommending decomposition
 - Reordering existing items in the backlog
@@ -273,6 +278,9 @@ Estimate silently. The human partner sees the size during show-before-write and 
 | "I have all the info to mark this done — I'll just move it without confirming" | No. Show the drafted Done entry. The human partner may want to adjust the What/Why/How. |
 | "I'm being asked to be efficient — confirmations slow things down" | The confirmations ARE the efficiency. They prevent backlog churn from wrong entries. |
 | "Done items don't need the full context — the PR has the history" | The Done `<details>` block IS the context, captured at the moment by someone who just did it. Future-you reading the backlog three months later will not have the PR open in another tab. Always preserve What / Why / How and the severity bubble. |
+| "This is a straightforward request with all the details given — invoking the skill would be overhead" | The Iron Law applies regardless of how simple the request seems. There is no fast path. Run the full procedure. |
+| "The skill would just confirm the obvious decision is 'capture' — I can skip ahead" | Step 1 of Procedure A is one of seven. Skipping ahead is not the savings you think it is — the duplicate check, structured template, and show-before-write all matter even when the do-now / backlog / drop choice is obvious. |
+| "I'll fill the unknown fields with TBD — that captures honest uncertainty" | TBD-filled entries are dead on arrival. Future-you cannot act on a backlog item where Where=TBD, Symptom=TBD, Acceptance=TBD. ASK now while the context is fresh, before drafting. |
 
 **All of these mean: STOP. Run the procedure as written.**
 
