@@ -48,3 +48,91 @@ Procedure A step 5 also tightened from "If any field cannot be filled confidentl
 All eight pressure scenarios PASS with the post-REFACTOR skill. RED baselines, GREEN v1 transcripts (showing initial 6/8 + 1 partial + 1 fail), GREEN v2 transcripts (showing the REFACTOR closing the remaining gaps), and this REFACTOR-NOTES file together constitute the TDD-for-skills evidence required by `writing-skills`.
 
 The skill is ready for the triggering test (Task 7) and end-to-end smoke test (Task 8).
+
+## End-to-end smoke test (Task 8)
+
+**Date:** 2026-05-01
+**Scratch dir:** /tmp/managing-backlog-items-smoke (fresh git init, .gitignore had only node_modules/)
+**Storage choice:** .local/BACKLOG.md (per pre-authorization)
+**Result:** PASS
+
+The agent successfully executed three real tasks end-to-end with real disk
+operations:
+- Created `.local/` directory and `.local/BACKLOG.md` with the full starter template
+- Asked-then-added `.local/` to .gitignore (per pre-authorization flow — the
+  skill correctly prompted, did not silent-edit)
+- Captured Task 1 (NODE_VERSION) under 🟠 HIGH with full structured template
+- Captured Task 2 (console.log replacement) under 🟡 MED with full structured template
+- Moved Task 1 to Done with severity bubble preserved (🟠), date stamped
+  (2026-05-01), full <details> block with What / Why / How
+
+Final BACKLOG.md contents — verbatim from disk after agent run:
+
+```markdown
+# Backlog
+
+<!-- Managed by the managing-backlog-items skill.
+
+     Priority legend:
+       - 🔴 **CRITICAL** — actively breaks production runs or causes data loss / silent corruption
+       - 🟠 **HIGH** — significantly degrades reliability, observability, or developer experience
+       - 🟡 **MED** — meaningful improvement, no immediate pain
+       - 🟢 **LOW** — nice-to-have, polish
+
+     Effort sizing: XS / S / M / L / XL / XXL based on complexity, LOC, and
+     wall-clock time. XXL items should be decomposed before adding — break
+     them into smaller items.
+-->
+
+## 🔴 CRITICAL
+
+## 🟠 HIGH
+
+## 🟡 MED
+
+- [ ] **Replace console.log debug statements with structured logger in parser**
+
+  <details>
+  <summary>Context</summary>
+
+  **Where**: `src/utils/parser.js`
+
+  **Symptom**: Debug output via `console.log` instead of a structured logger
+
+  **Why it matters**: `console.log` output cannot be filtered or routed in production; clutters logs and may leak sensitive data
+
+  **Proposed fix**: Replace all `console.log` calls with calls to the project logger (e.g. winston or pino)
+
+  **Acceptance**: No `console.log` calls remain in `src/utils/parser.js`; all debug output goes through the logger
+
+  **Effort**: S — single file, ~20-30 lines of mechanical replacement, ~30 min
+
+  </details>
+
+## 🟢 LOW
+
+## Done
+
+- [x] 🟠 **Validate NODE_VERSION matches .nvmrc in build script** — 2026-05-01
+
+  <details>
+  <summary>Outcome</summary>
+
+  **What**: Added a node version check at the top of `scripts/build.sh` that compares `node --version` against `.nvmrc` and exits with a clear error on mismatch
+
+  **Why**: Builds can succeed locally with a wrong node version, then fail in CI or in production
+
+  **How**: Added NODE_VERSION validation to `scripts/build.sh` in commit abc1234
+
+  </details>
+```
+
+`git status` after the run showed `.local/` properly gitignored (does not appear as
+untracked) and the `.gitignore` modification itself unstaged — confirming the skill
+did not auto-stage either the backlog file or the gitignore change.
+
+**Note on test methodology:** The smoke test required pre-authorizing all
+human-in-the-loop confirmations (storage choice, .gitignore add, draft approval,
+Done-move approval) at the start of the prompt because `claude -p` is non-interactive
+and cannot answer mid-run questions. In real interactive use the human partner
+answers each confirmation as it arises — this is the skill working as designed.
