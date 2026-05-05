@@ -16,7 +16,7 @@ The goal is to close that gap. The agent should self-check its own prose against
 ## Goals
 
 1. Catch AI-sounding prose **before it gets persisted**: markdown files, PR descriptions, commit bodies, READMEs, doc files, release notes, blog posts.
-2. Catch AI-sounding prose in chat replies once the reply is substantive enough to be worth checking (rough threshold: ~75 words of natural-language prose).
+2. Catch AI-sounding prose in chat replies once the reply is substantive enough to be worth checking (rough threshold: ~30 words of natural-language prose).
 3. Never apply humanizer rules to code, code comments, commit subject lines, tool output, or short conversational replies. Many humanizer rules are wrong for those contexts.
 4. Keep the heavyweight humanizer reference out of normal context. Only load it when the trigger fires.
 5. Dogfood the skill on its own artifacts: humanize the prose sections of this spec, the trigger skill, and the adapted humanizer SKILL.md before committing. The pattern catalog inside the humanizer is illustrative reference content and stays verbatim. If the skill cannot survive being applied to its own prose, it is not ready.
@@ -52,7 +52,7 @@ This split mirrors how other superpowers skills handle heavy reference material 
 ```yaml
 ---
 name: humanizing-prose
-description: Use when about to write prose for a human reader: markdown files, PR descriptions, commit bodies, READMEs, doc pages, release notes, blog posts, or chat replies longer than about a paragraph. Catches AI-sounding writing (significance inflation, em dash overuse, rule of three, hedging, sycophancy) before it gets sent or committed.
+description: Use when about to write prose for a human reader: markdown files, PR descriptions, commit bodies, READMEs, doc pages, release notes, blog posts, or chat replies longer than a couple of sentences. Catches AI-sounding writing (significance inflation, em dash overuse, rule of three, hedging, sycophancy) before it gets sent or committed.
 ---
 ```
 
@@ -74,11 +74,11 @@ The agent runs this skill before producing prose in any of these contexts:
 
 ### When to Fire (chat replies)
 
-For chat replies to the human partner: fire when the reply will exceed roughly **75 words of natural-language prose** (about a paragraph). Below that, skip the check. Quick acknowledgments, "running it now," short answers to direct questions, and one-or-two-sentence status updates do not need humanizing.
+For chat replies to the human partner: fire when the reply will exceed roughly **30 words of natural-language prose** (about two sentences). Below that, skip the check. Quick acknowledgments, "running it now," short answers to direct questions, and one-sentence status updates do not need humanizing.
 
-The 75-word threshold is a guideline, not a counter. The agent estimates as it drafts; if the reply is going to be substantive enough to explain a decision, walk through trade-offs, or summarize work, the check fires.
+The 30-word threshold is a guideline, not a counter. The agent estimates as it drafts; if the reply is going to be more than a quick one-liner, the check fires.
 
-**What counts toward the 75 words:** only natural-language prose intended for the human partner to read. Code blocks, tool output the agent is relaying, structured tables, JSON, command output, and direct quotes do not count. A reply that is mostly a code block with a one-sentence framing is below threshold even if total characters are large. A reply that is three short prose paragraphs interleaved with code is above threshold and the prose paragraphs get humanized; the code stays untouched.
+**What counts toward the 30 words:** only natural-language prose intended for the human partner to read. Code blocks, tool output the agent is relaying, structured tables, JSON, command output, and direct quotes do not count. A reply that is mostly a code block with a one-sentence framing is below threshold even if total characters are large. A reply that is three short prose paragraphs interleaved with code is above threshold and the prose paragraphs get humanized; the code stays untouched.
 
 ### When NOT to Fire (always skip)
 
@@ -88,7 +88,7 @@ The 75-word threshold is a guideline, not a counter. The agent estimates as it d
 | Code comments | Often should be terse, declarative, passive; humanizer would degrade them |
 | Commit message **subject lines** | Need to stay imperative and short |
 | Error messages, stack traces, tool output being relayed | Not the agent's prose |
-| Short chat replies (under ~75 words) | Cost not worth it |
+| Short chat replies (under ~30 words of prose) | Cost not worth it |
 | Direct quotes of someone else's writing | Quoting verbatim is the point |
 | Structured output: JSON, YAML, tables, config files | Not prose |
 | Terminal command output being shown back to the human partner | Not the agent's prose |
@@ -101,7 +101,7 @@ The 75-word threshold is a guideline, not a counter. The agent estimates as it d
    Before producing prose, check: does this fall into a fire context?
    - File extension or path matches the always-fire list, OR
    - Output destination is a PR/commit body, release note, etc., OR
-   - This is a chat reply that will exceed ~75 words.
+   - This is a chat reply that will exceed ~30 words of prose.
 
    If yes → continue. If no → write normally, skip this skill.
 
@@ -138,7 +138,7 @@ The 75-word threshold is a guideline, not a counter. The agent estimates as it d
 - Applying humanizer rules to code or code comments
 - Rewriting a commit subject line to "make it less AI-sounding"
 - Humanizing a direct quote of someone else's writing
-- Padding short chat replies up to 75 words to trigger the check (the threshold is a ceiling-style trigger, not a target)
+- Padding short chat replies up to 30 words to trigger the check (the threshold is a ceiling-style trigger, not a target)
 - Loading the humanizer reference on every short message "just in case"
 
 ### Common Rationalizations
@@ -217,37 +217,16 @@ compatibility: claude-code opencode codex gemini-cli
 
 The description is reframed as "reference catalog loaded on demand" so it does not get triggered as a standalone skill. `humanizing-prose` is the front door.
 
-## Bulletproofing
-
-Per `writing-skills`, anything that shapes agent behavior gets RED → GREEN → REFACTOR testing with subagents under realistic conditions.
-
-### RED (baseline, before the skills exist)
-
-Dispatch a subagent with no humanizing skills loaded. Give it three tasks:
-1. Write a PR description for a small refactor (3–5 file changes).
-2. Write a README section introducing a hypothetical CLI tool.
-3. Reply to a question about a design trade-off in 100–200 words.
-
-Capture the output verbatim. Score each against the humanizer's pattern catalog: how many patterns hit?
-
-### GREEN (with the skills)
-
-Same three tasks, same subagent role, with `humanizing-prose` and `humanizer` available. Capture the output. Score the same way.
-
-**Pass criteria:** the GREEN output has noticeably fewer pattern hits across all three tasks. Not zero, since humans still write rule-of-three sometimes, but a meaningful reduction, especially on the high-frequency tells: em dashes, "stands as," sycophantic openers, generic positive conclusions.
-
-### REFACTOR
-
-If a pattern still hits in GREEN, the trigger or the procedure is leaking. Tighten the trigger skill (clearer fire/skip conditions, sharper red flags) and re-test. Do not modify the humanizer pattern catalog.
-
-### Dogfooding
+## Dogfooding
 
 While building this:
 - This spec gets humanized before being committed.
 - The trigger skill content gets humanized before being committed.
-- The adapted humanizer SKILL.md gets humanized in the prose sections (the pattern catalog stays verbatim because it is illustrative content, not prose for a human reader).
+- The adapted humanizer SKILL.md gets humanized in the prose sections. The pattern catalog stays verbatim because it is illustrative reference content, not prose for a human reader.
 
-If the act of humanizing the spec produces prose that is worse, that is a signal the skill needs work, not the spec.
+If applying the humanizer rules to the spec produces prose that is worse, that is a signal the skill needs work, not the spec.
+
+No formal subagent-based RED/GREEN/REFACTOR testing for this skill. The human partner will assess effectiveness from real use.
 
 ## Migration
 
@@ -255,9 +234,8 @@ Steps in order:
 
 1. Create `skills/humanizing-prose/SKILL.md` (this design's trigger skill).
 2. Create `skills/humanizer/SKILL.md` by copying from `~/.config/opencode/skills/humanizer/SKILL.md`, then apply the Process / Output Format / frontmatter changes described above.
-3. Run RED → GREEN → REFACTOR.
-4. Once GREEN passes, remove `~/.config/opencode/skills/humanizer/` so there is one source of truth.
-5. Commit to `feat/humanizing-prose-skill`. Push to `origin` (your fork). No upstream PR.
+3. Remove `~/.config/opencode/skills/humanizer/` so there is one source of truth.
+4. Commit to `feat/humanizing-prose-skill`. Push to `origin` (your fork). No upstream PR.
 
 ## Future Work
 
