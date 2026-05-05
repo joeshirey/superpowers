@@ -464,7 +464,7 @@ If the human partner invokes this skill directly with a chunk of text to humaniz
 
 ## Full Example
 
-> **Note:** The labeled "Draft rewrite / What makes the below so obviously AI generated? / Now make it not obviously AI generated. / Changes made" structure shown below is illustrative for direct human-invoked use. When the agent runs the self-check workflow defined above (invoked by `humanizing-prose`), the audit and the change log stay internal — only the final revised prose is shipped.
+> **Note:** The labeled "Draft rewrite / What makes the below so obviously AI generated? / Now make it not obviously AI generated. / Changes made" structure shown below is illustrative for direct human-invoked use. When the agent runs the self-check workflow defined above (invoked by `humanizing-prose`), the audit and the change log stay internal. Only the final revised prose is shipped.
 
 **Before (AI-sounding):**
 > Great question! Here is an essay on this topic. I hope this helps!
