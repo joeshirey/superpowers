@@ -1,22 +1,6 @@
 ---
 name: humanizer
-version: 2.5.1
-description: |
-  Remove signs of AI-generated writing from text. Use when editing or reviewing
-  text to make it sound more natural and human-written. Based on Wikipedia's
-  comprehensive "Signs of AI writing" guide. Detects and fixes patterns including:
-  inflated symbolism, promotional language, superficial -ing analyses, vague
-  attributions, em dash overuse, rule of three, AI vocabulary words, passive
-  voice, negative parallelisms, and filler phrases.
-license: MIT
-compatibility: claude-code opencode
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-  - AskUserQuestion
+description: Reference catalog of AI-writing patterns and how to fix them. Loaded on demand by the humanizing-prose skill when the agent is about to produce prose for a human reader. Covers significance inflation, em dash overuse, rule of three, AI vocabulary, passive voice, sycophancy, and ~25 other patterns from Wikipedia's Signs of AI writing.
 ---
 
 # Humanizer: Remove AI Writing Patterns
@@ -463,33 +447,24 @@ Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as
 
 ---
 
-## Process
+## Self-Check Workflow
 
-1. Read the input text carefully
-2. Identify all instances of the patterns above
-3. Rewrite each problematic section
-4. Ensure the revised text:
-   - Sounds natural when read aloud
-   - Varies sentence structure naturally
-   - Uses specific details over vague claims
-   - Maintains appropriate tone for context
-   - Uses simple constructions (is/are/has) where appropriate
-5. Present a draft humanized version
-6. Prompt: "What makes the below so obviously AI generated?"
-7. Answer briefly with the remaining tells (if any)
-8. Prompt: "Now make it not obviously AI generated."
-9. Present the final version (revised after the audit)
+This workflow is invoked by the `humanizing-prose` skill when the agent is about to produce prose for a human reader. The agent runs it silently against its own draft; nothing about the workflow itself appears in the output the human partner sees.
 
-## Output Format
+1. Hold the draft in mind. Do not print it.
+2. Scan against the 29 patterns documented in the sections above. Note every match.
+3. Revise the matched spots in place. Apply the personality and voice guidance from the PERSONALITY AND SOUL section so the result has a pulse, not just absent AI tells.
+4. Read the revised version back as if a human wrote it. If anything still reads as obviously AI-generated, revise again.
+5. Ship the revised version. Do not print the pre-revision draft, the audit, or the change log unless the human partner asks for them.
 
-Provide:
-1. Draft rewrite
-2. "What makes the below so obviously AI generated?" (brief bullets)
-3. Final rewrite
-4. A brief summary of changes made (optional, if helpful)
+### When invoked directly (legacy / manual use)
+
+If the human partner invokes this skill directly with a chunk of text to humanize (rather than via `humanizing-prose`), the older draft → audit → final output structure shown in the Full Example below is appropriate. Use it when the human partner explicitly wants to see the audit step, otherwise default to the silent workflow above.
 
 
 ## Full Example
+
+> **Note:** The labeled "Draft rewrite / What makes the below so obviously AI generated? / Now make it not obviously AI generated. / Changes made" structure shown below is illustrative for direct human-invoked use. When the agent runs the self-check workflow defined above (invoked by `humanizing-prose`), the audit and the change log stay internal — only the final revised prose is shipped.
 
 **Before (AI-sounding):**
 > Great question! Here is an essay on this topic. I hope this helps!
