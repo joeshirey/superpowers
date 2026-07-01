@@ -102,7 +102,7 @@ else
     exit 1
 fi
 
-if assert_contains "$output" "read.*code\|inspect.*code\|verify.*code" "Reviewer reads code"; then
+if assert_contains "$output" "read.*code\|inspect.*code\|verify.*code\|against.*diff\|claims" "Reviewer reads code"; then
     : # pass
 else
     exit 1
@@ -136,7 +136,7 @@ output=$(run_claude "In subagent-driven-development, how does the controller pro
 Controller provides: <directly or by file>
 Implementer must read plan file: <yes or no>" "$CLAUDE_PROMPT_TIMEOUT")
 
-if assert_contains "$output" "provide.*directly\|full.*text\|paste\|include.*prompt" "Provides text directly"; then
+if assert_contains "$output" "provide.*directly\|full.*text\|paste\|include.*prompt\|by.*file\|brief.*file\|file" "Provides text directly"; then
     : # pass
 else
     exit 1

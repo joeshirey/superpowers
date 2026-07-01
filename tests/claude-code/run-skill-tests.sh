@@ -22,6 +22,15 @@ if ! command -v claude &> /dev/null; then
     exit 1
 fi
 
+# Fallback for timeout command if not available (e.g. on macOS)
+if ! command -v timeout &>/dev/null; then
+    timeout() {
+        local timeout_val="$1"
+        shift
+        "$@"
+    }
+fi
+
 # Parse command line arguments
 VERBOSE=false
 SPECIFIC_TEST=""

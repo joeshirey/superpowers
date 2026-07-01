@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 # Helper functions for Claude Code skill tests
 
+# Fallback for timeout command if not available (e.g. on macOS)
+if ! command -v timeout &>/dev/null; then
+    timeout() {
+        local timeout_val="$1"
+        shift
+        "$@"
+    }
+fi
+
 # Run Claude Code with a prompt and capture output
 # Usage: run_claude "prompt text" [timeout_seconds] [allowed_tools]
 run_claude() {
@@ -28,14 +37,14 @@ run_claude() {
     fi
 }
 
-# Check if output contains a pattern
+# Check if output contains a pattern (case-insensitive)
 # Usage: assert_contains "output" "pattern" "test name"
 assert_contains() {
     local output="$1"
     local pattern="$2"
     local test_name="${3:-test}"
 
-    if echo "$output" | grep -q "$pattern"; then
+    if echo "$output" | grep -qi "$pattern"; then
         echo "  [PASS] $test_name"
         return 0
     else
@@ -47,14 +56,14 @@ assert_contains() {
     fi
 }
 
-# Check if output does NOT contain a pattern
+# Check if output does NOT contain a pattern (case-insensitive)
 # Usage: assert_not_contains "output" "pattern" "test name"
 assert_not_contains() {
     local output="$1"
     local pattern="$2"
     local test_name="${3:-test}"
 
-    if echo "$output" | grep -q "$pattern"; then
+    if echo "$output" | grep -qi "$pattern"; then
         echo "  [FAIL] $test_name"
         echo "  Did not expect to find: $pattern"
         echo "  In output:"
@@ -66,7 +75,7 @@ assert_not_contains() {
     fi
 }
 
-# Check if output matches a count
+# Check if output matches a count (case-insensitive)
 # Usage: assert_count "output" "pattern" expected_count "test name"
 assert_count() {
     local output="$1"
@@ -74,7 +83,7 @@ assert_count() {
     local expected="$3"
     local test_name="${4:-test}"
 
-    local actual=$(echo "$output" | grep -c "$pattern" || echo "0")
+    local actual=$(echo "$output" | grep -ic "$pattern" || echo "0")
 
     if [ "$actual" -eq "$expected" ]; then
         echo "  [PASS] $test_name (found $actual instances)"
@@ -97,9 +106,9 @@ assert_order() {
     local pattern_b="$3"
     local test_name="${4:-test}"
 
-    # Get line numbers where patterns appear
-    local line_a=$(echo "$output" | grep -n "$pattern_a" | head -1 | cut -d: -f1)
-    local line_b=$(echo "$output" | grep -n "$pattern_b" | head -1 | cut -d: -f1)
+    # Get line numbers where patterns appear (case-insensitive)
+    local line_a=$(echo "$output" | grep -in "$pattern_a" | head -1 | cut -d: -f1)
+    local line_b=$(echo "$output" | grep -in "$pattern_b" | head -1 | cut -d: -f1)
 
     if [ -z "$line_a" ]; then
         echo "  [FAIL] $test_name: pattern A not found: $pattern_a"
